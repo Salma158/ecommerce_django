@@ -103,6 +103,8 @@ DATABASES = {
         'NAME': 'ecommerce',
         'USER': env('DATABASE_USER'),
         'PASSWORD': env('DATABASE_PASS'),
+        'HOST': env('DB_HOST'),
+        'PORT': env('DB_PORT'),
     }
 }
 
