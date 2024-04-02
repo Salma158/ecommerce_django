@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 from pathlib import Path
 from datetime import timedelta
 import environ
+import os
 
 env = environ.Env()
 environ.Env.read_env()
@@ -59,6 +60,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'users',
+    'corsheaders',
+    'products',
+
 ]
 
 AUTH_USER_MODEL = 'users.Account'
@@ -71,7 +75,23 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
+
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+]
+
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+]
+
 
 ROOT_URLCONF = 'ecommerce.urls'
 
@@ -94,20 +114,24 @@ TEMPLATES = [
 WSGI_APPLICATION = 'ecommerce.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/5.0/ref/settings/#databases
-
 DATABASES = {
-   'default': {
+    'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'ecommerce',
-        'USER': env('DATABASE_USER'),
-        'PASSWORD': env('DATABASE_PASS'),
-        'HOST': env('DB_HOST'),
-        'PORT': env('DB_PORT'),
+        'NAME': os.environ.get('MYSQLDATABASE', 'railway'),
+        'USER': os.environ.get('MYSQLUSER', 'root'),
+        'PASSWORD': os.environ.get('MYSQLPASSWORD', 'lVwOlghIVtifZwlkVCjMvfvLbOIUINnW'),
+        'HOST': os.environ.get('MYSQLHOST', 'roundhouse.proxy.rlwy.net'),
+        'PORT': os.environ.get('MYSQLPORT', '52117'),
     }
 }
 
+# Additional MySQL settings if needed
+
+# MYSQL_DATABASE and MYSQL_URL seem redundant, but including for completeness
+MYSQL_DATABASE = os.environ.get('MYSQL_DATABASE', 'railway')
+MYSQL_PRIVATE_URL = os.environ.get('MYSQL_PRIVATE_URL', 'mysql://root:lVwOlghIVtifZwlkVCjMvfvLbOIUINnW@mysql.railway.internal:3306/railway')
+MYSQL_ROOT_PASSWORD = os.environ.get('MYSQL_ROOT_PASSWORD', 'lVwOlghIVtifZwlkVCjMvfvLbOIUINnW')
+MYSQL_URL = os.environ.get('MYSQL_URL', 'mysql://root:lVwOlghIVtifZwlkVCjMvfvLbOIUINnW@roundhouse.proxy.rlwy.net:52117/railway')
 
 
 
@@ -145,7 +169,16 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
+
 STATIC_URL = 'static/'
+
+MEDIA_URL = '/images/'
+
+STATICFILES_DIRS = [
+    BASE_DIR / 'static'
+]
+
+MEDIA_ROOT = 'static/images'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
