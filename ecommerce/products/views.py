@@ -187,13 +187,25 @@ def productSearch(request, query):
     serializer = ProductSerializer(products, many=True)
     return Response(serializer.data)
 
+# @api_view(['POST'])
+# def upload_image(request):
+#     if request.method == 'POST' and request.FILES['image']:
+#         image_file = request.FILES['image']
+#         fs = FileSystemStorage()
+#         filename = fs.save(image_file.name, image_file)
+#         uploaded_file_url = fs.url(filename)
+#         return JsonResponse({'uploaded_file_url': uploaded_file_url})
+#     return HttpResponseBadRequest()
+
+from cloudinary.uploader import upload
+
+
 @api_view(['POST'])
 def upload_image(request):
     if request.method == 'POST' and request.FILES['image']:
         image_file = request.FILES['image']
-        fs = FileSystemStorage()
-        filename = fs.save(image_file.name, image_file)
-        uploaded_file_url = fs.url(filename)
-        return JsonResponse({'uploaded_file_url': uploaded_file_url})
+        # Upload image to Cloudinary
+        uploaded_file = upload(image_file)
+        return JsonResponse({'uploaded_file_url': uploaded_file['secure_url']})
     return HttpResponseBadRequest()
 

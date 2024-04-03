@@ -23,6 +23,8 @@
 #         return self.productname
 
 from django.db import models
+from cloudinary_storage.storage import RawMediaCloudinaryStorage
+
 
 class Category(models.Model):
     categoryname = models.CharField(max_length=30)
@@ -34,7 +36,9 @@ class Category(models.Model):
 
 class Product(models.Model):
     productname = models.CharField(max_length=150)
-    image = models.ImageField(null=True, blank=True)
+    # image = models.ImageField(null=True, blank=True)
+    # image = models.URLField(null=True, blank=True)  # Change ImageField to URLField
+    image = models.ImageField(null=True, blank=True, upload_to='products/', storage=RawMediaCloudinaryStorage())
     productbrand = models.CharField(max_length=100, null=True, blank=True)
     productcategory = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='products')  
     productinfo = models.TextField(null=True, blank=True)

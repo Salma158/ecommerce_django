@@ -12,6 +12,10 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 import os
 from pathlib import Path
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -44,9 +48,13 @@ INSTALLED_APPS = [
     'corsheaders',
     'products',
     'users',
+    'cloudinary_storage',
+
 
 ]
-
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:3000',
+]
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -121,6 +129,12 @@ MYSQL_URL = os.environ.get('MYSQL_URL', 'mysql://root:lVwOlghIVtifZwlkVCjMvfvLbO
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': 'dzwxhvj5m',
+    'API_KEY': '485762354413643',
+    'API_SECRET': 'Q67RPKvbGneFLeWj1oNxuHXIvB4'
+}
 
 AUTH_PASSWORD_VALIDATORS = [
     {
