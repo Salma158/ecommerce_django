@@ -17,6 +17,7 @@ class MyAccountManager(BaseUserManager):
         )
 
         user.set_password(password)
+        user.is_active = True
         user.save()
         return user
 
@@ -52,11 +53,9 @@ class Account(AbstractBaseUser, PermissionsMixin):
 
     objects = MyAccountManager()
 
-    # we need this in the admin panel
     def __str__(self):
         return self.email
 
-    # to be understood
     def full_name(self):
         return f'{self.first_name} {self.last_name}'
 

@@ -62,7 +62,7 @@ INSTALLED_APPS = [
     'users',
     'corsheaders',
     'products',
-
+    'wishlists'
 ]
 
 AUTH_USER_MODEL = 'users.Account'
