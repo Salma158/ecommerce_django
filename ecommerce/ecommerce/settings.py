@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -26,6 +27,8 @@ SECRET_KEY = 'django-insecure-rjr6k!*!e%mnqd5e!0i2eav#y^&&dxwwjo@!uhx#l(&7u&j!z&
 DEBUG = True
 
 ALLOWED_HOSTS = []
+AUTH_USER_MODEL = 'users.Account'
+
 
 
 # Application definition
@@ -40,6 +43,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'products',
+    'users',
+
 ]
 
 MIDDLEWARE = [
@@ -78,12 +83,40 @@ WSGI_APPLICATION = 'ecommerce.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'ecommerce',
+#         'USER': 'djano_user',
+#         'PASSWORD': 'djano_user',
+#         'HOST': '192.168.1.12',  
+#         'PORT': '3306',
+#     }
+# }
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': os.environ.get('MYSQLDATABASE', 'railway'),
+        'USER': os.environ.get('MYSQLUSER', 'root'),
+        'PASSWORD': os.environ.get('MYSQLPASSWORD', 'lVwOlghIVtifZwlkVCjMvfvLbOIUINnW'),
+        'HOST': os.environ.get('MYSQLHOST', 'roundhouse.proxy.rlwy.net'),
+        'PORT': os.environ.get('MYSQLPORT', '52117'),
     }
 }
+
+# Additional MySQL settings if needed
+
+# MYSQL_DATABASE and MYSQL_URL seem redundant, but including for completeness
+MYSQL_DATABASE = os.environ.get('MYSQL_DATABASE', 'railway')
+MYSQL_PRIVATE_URL = os.environ.get('MYSQL_PRIVATE_URL', 'mysql://root:lVwOlghIVtifZwlkVCjMvfvLbOIUINnW@mysql.railway.internal:3306/railway')
+MYSQL_ROOT_PASSWORD = os.environ.get('MYSQL_ROOT_PASSWORD', 'lVwOlghIVtifZwlkVCjMvfvLbOIUINnW')
+MYSQL_URL = os.environ.get('MYSQL_URL', 'mysql://root:lVwOlghIVtifZwlkVCjMvfvLbOIUINnW@roundhouse.proxy.rlwy.net:52117/railway')
 
 
 # Password validation
