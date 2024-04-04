@@ -9,28 +9,25 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.views import APIView
 
 
-class WishlistPagination(PageNumberPagination):
-    page_size = 10
-    page_size_query_param = 'page_size'
-    max_page_size = 100
 
 class WishlistGetandAdd(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = WishlistSerializer
-    pagination_class = WishlistPagination
-
-    def get_queryset(self):
-        user = self.request.user
-        return Wishlist.objects.filter(user=user)
+    queryset = Wishlist.objects.all()
 
     def create(self, request):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user = request.user
         product_id = request.data.get('product')
-        product = serializer.validated_data['product']
+        user = request.user
         wishlist, created = Wishlist.objects.get_or_create(user=user)
-        product = get_object_or_404(Product, pk=product_id)
+        
+        try:
+            product = Product.objects.get(_id=product_id)
+        except Product.DoesNotExist:
+            return Response({"message": "Product not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        if product in wishlist.product.all():
+            return Response({"message": "Product already exists in the wishlist."}, status=status.HTTP_400_BAD_REQUEST)
+
         wishlist.product.add(product)
         
         if created:
@@ -38,18 +35,18 @@ class WishlistGetandAdd(generics.ListCreateAPIView):
         else:
             return Response({"message": "Product added to wishlist successfully."}, status=status.HTTP_201_CREATED)
 
+
+
 class WishlistDelete(APIView):
     permission_classes = [IsAuthenticated]
-    serializer_class = WishlistSerializer
 
     def delete(self, request, product_id):
         user = request.user
         wishlist = get_object_or_404(Wishlist, user=user)
         product = get_object_or_404(Product, pk=product_id)
         
-        if product in wishlist.product.all():
+        if product in wishlist.product.all():  
             wishlist.product.remove(product)
             return Response({"message": "Product removed from wishlist successfully."}, status=status.HTTP_200_OK)
         else:
             return Response({"error": "Product not found in wishlist."}, status=status.HTTP_404_NOT_FOUND)
-
