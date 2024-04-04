@@ -1,11 +1,11 @@
 from django.db import models
-from django.contrib.auth.models import User
+from users.models import Account
 from order.models import Order
 
 # Create your models here.
 
 class ShippingAddress(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(Account, on_delete=models.CASCADE)
     shipping_address = models.AutoField(primary_key = True, editable = False)
     address = models.CharField(max_length=300)
     city = models.CharField(max_length=60)

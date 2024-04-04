@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import User
+from users.models import Account
 from products.models import Product
 
 SHIPPING_STATUS_CHOICES = (
@@ -16,7 +16,7 @@ ORDER_STATUS_CHOICES = (
 
 
 class Order(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(Account, on_delete=models.CASCADE)
     order_id = models.AutoField(primary_key=True, editable=False)
     delivery_date = models.DateTimeField(auto_now_add=False, null=True, blank=True)
     placing_date = models.DateTimeField(auto_now_add=True)
