@@ -12,11 +12,16 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 import os
 from pathlib import Path
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
+
 from datetime import timedelta
 import environ
 
 env = environ.Env()
 environ.Env.read_env()
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -26,30 +31,17 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-(o*-%vzvkbsz2sl(a%7=1*ee69ln44z6#u)5+_bvai4h#0#kpv'
+SECRET_KEY = 'django-insecure-rjr6k!*!e%mnqd5e!0i2eav#y^&&dxwwjo@!uhx#l(&7u&j!z&'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 ALLOWED_HOSTS = []
+AUTH_USER_MODEL = 'users.Account'
+
 
 
 # Application definition
-REST_FRAMEWORK = {
-    "NON_FIELD_ERRORS_KEY":"errors",
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ),
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.AllowAny',
-    ],
-}
-SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(hours=2),
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
-    "SIGNING_KEY": SECRET_KEY,
-    "AUTH_HEADER_TYPES": ("Bearer",),
-}
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -59,8 +51,17 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'corsheaders',
+    'products',
     'users',
+    'cloudinary_storage',
+    'wishlists'
 ]
+
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:3000',
+]
+
 
 AUTH_USER_MODEL = 'users.Account'
 
@@ -72,6 +73,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.common.CommonMiddleware",
 ]
 
 ROOT_URLCONF = 'ecommerce.urls'
@@ -108,6 +111,22 @@ WSGI_APPLICATION = 'ecommerce.wsgi.application'
 # }
 
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'ecommerce',
+#         'USER': 'djano_user',
+#         'PASSWORD': 'djano_user',
+#         'HOST': '192.168.1.12',  
+#         'PORT': '3306',
+#     }
+# }
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -119,9 +138,6 @@ DATABASES = {
     }
 }
 
-# Additional MySQL settings if needed
-
-# MYSQL_DATABASE and MYSQL_URL seem redundant, but including for completeness
 MYSQL_DATABASE = os.environ.get('MYSQL_DATABASE', 'railway')
 MYSQL_PRIVATE_URL = os.environ.get('MYSQL_PRIVATE_URL', 'mysql://root:lVwOlghIVtifZwlkVCjMvfvLbOIUINnW@mysql.railway.internal:3306/railway')
 MYSQL_ROOT_PASSWORD = os.environ.get('MYSQL_ROOT_PASSWORD', 'lVwOlghIVtifZwlkVCjMvfvLbOIUINnW')
@@ -129,8 +145,15 @@ MYSQL_URL = os.environ.get('MYSQL_URL', 'mysql://root:lVwOlghIVtifZwlkVCjMvfvLbO
 
 
 
+
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': 'dzwxhvj5m',
+    'API_KEY': '485762354413643',
+    'API_SECRET': 'Q67RPKvbGneFLeWj1oNxuHXIvB4'
+}
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -163,9 +186,36 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
+
 STATIC_URL = 'static/'
 
+MEDIA_URL = '/images/'
+
+STATICFILES_DIRS = [
+    BASE_DIR / 'static'
+]
+
+MEDIA_ROOT = 'static/images'
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+CORS_ALLOW_ALL_ORIGIN = True
+from datetime import timedelta
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(hours=2),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "SIGNING_KEY": SECRET_KEY,
+    "AUTH_HEADER_TYPES": ("Bearer",),
+}
+REST_FRAMEWORK = {
+    "NON_FIELD_ERRORS_KEY":"errors",
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',
+    ],
+}
