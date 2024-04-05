@@ -8,6 +8,7 @@ from cloudinary.uploader import upload
 
 from .models import Product, Category
 from .serializer import ProductSerializer, CategorySerializer
+from rest_framework.pagination import PageNumberPagination
 
 @api_view(['GET'])
 def getRoutes(request):
@@ -16,9 +17,15 @@ def getRoutes(request):
 @api_view(['GET', 'POST'])
 def getProducts(request):
     if request.method == 'GET':
+        # products = Product.objects.all()
+        # serializer = ProductSerializer(products, many=True)
+        # return Response(serializer.data)
         products = Product.objects.all()
-        serializer = ProductSerializer(products, many=True)
-        return Response(serializer.data)
+        paginator = PageNumberPagination()
+        paginator.page_size = 8  
+        paginated_products = paginator.paginate_queryset(products, request)       
+        serializer = ProductSerializer(paginated_products, many=True)
+        return paginator.get_paginated_response(serializer.data)
     elif request.method == 'POST':
         serializer = ProductSerializer(data=request.data)
         if serializer.is_valid():
