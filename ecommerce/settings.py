@@ -16,6 +16,8 @@ import cloudinary
 import cloudinary.uploader
 import cloudinary.api
 
+from datetime import timedelta
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -49,12 +51,18 @@ INSTALLED_APPS = [
     'products',
     'users',
     'cloudinary_storage',
-
-
+    'wishlists',
+    'order',
+    'shipping_address'
 ]
+
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
 ]
+
+
+AUTH_USER_MODEL = 'users.Account'
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -88,25 +96,6 @@ TEMPLATES = [
 WSGI_APPLICATION = 'ecommerce.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/5.0/ref/settings/#databases
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'ecommerce',
-#         'USER': 'djano_user',
-#         'PASSWORD': 'djano_user',
-#         'HOST': '192.168.1.12',  
-#         'PORT': '3306',
-#     }
-# }
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -118,14 +107,12 @@ DATABASES = {
     }
 }
 
-
-# Additional MySQL settings if needed
-
-# MYSQL_DATABASE and MYSQL_URL seem redundant, but including for completeness
 MYSQL_DATABASE = os.environ.get('MYSQL_DATABASE', 'railway')
 MYSQL_PRIVATE_URL = os.environ.get('MYSQL_PRIVATE_URL', 'mysql://root:lVwOlghIVtifZwlkVCjMvfvLbOIUINnW@mysql.railway.internal:3306/railway')
 MYSQL_ROOT_PASSWORD = os.environ.get('MYSQL_ROOT_PASSWORD', 'lVwOlghIVtifZwlkVCjMvfvLbOIUINnW')
 MYSQL_URL = os.environ.get('MYSQL_URL', 'mysql://root:lVwOlghIVtifZwlkVCjMvfvLbOIUINnW@roundhouse.proxy.rlwy.net:52117/railway')
+
+
 
 
 # Password validation
