@@ -21,7 +21,7 @@ def getRoutes(request):
 def getProducts(request):
     products = Product.objects.all()
     paginator = PageNumberPagination()
-    paginator.page_size = 8  
+    paginator.page_size = 4  
     paginated_products = paginator.paginate_queryset(products, request)       
     serializer = ProductSerializer(paginated_products, many=True)
     return paginator.get_paginated_response(serializer.data)

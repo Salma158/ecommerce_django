@@ -14,32 +14,6 @@ class CategorySerializer(serializers.ModelSerializer):
         model = Category
         fields = '__all__'
 
-# class ProductSerializer(serializers.ModelSerializer):
-#     productcategory = CategorySerializer()
-#     num_reviews = serializers.SerializerMethodField()
-#     reviews = ReviewSerializer(many=True, read_only=True)  
-#     average_rating = serializers.SerializerMethodField()
-
-#     class Meta:
-#         model = Product
-#         fields = '__all__'
-
-#     def get_num_reviews(self, obj):
-#         """
-#         Returns the number of reviews associated with this product.
-#         """
-#         return obj.reviews.count()
-
-#     def get_average_rating(self, obj):
-#         """
-#         Returns the average rating of the product based on its reviews.
-#         """
-#         reviews = obj.reviews.all()
-#         if reviews.exists():
-#             total_rating = sum(review.rating for review in reviews)
-#             return total_rating / reviews.count()
-#         else:
-#             return 0  
 
 from .models import ProductImage
 class ProductImageSerializer(serializers.ModelSerializer):
@@ -52,7 +26,7 @@ class ProductSerializer(serializers.ModelSerializer):
     num_reviews = serializers.SerializerMethodField()
     reviews = ReviewSerializer(many=True, read_only=True)  
     average_rating = serializers.SerializerMethodField()
-    images = ProductImageSerializer(many=True, read_only=True)  # Add this field
+    images = ProductImageSerializer(many=True, read_only=True)  
 
     class Meta:
         model = Product
