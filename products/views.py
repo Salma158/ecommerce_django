@@ -19,7 +19,8 @@ def getRoutes(request):
 
 @api_view(['GET'])
 def getProducts(request):
-    products = Product.objects.all()
+    # products = Product.objects.all()
+    products = Product.objects.all().order_by('-createdAt')  # Newest products first
     paginator = PageNumberPagination()
     paginator.page_size = 4  
     paginated_products = paginator.paginate_queryset(products, request)       

@@ -32,6 +32,7 @@ class ProductSerializer(serializers.ModelSerializer):
         model = Product
         fields = '__all__'
 
+
     def get_num_reviews(self, obj):
         """
         Returns the number of reviews associated with this product.
