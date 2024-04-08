@@ -53,7 +53,8 @@ INSTALLED_APPS = [
     'cloudinary_storage',
     'wishlists',
     'order',
-    'shipping_address'
+    'shipping_address',
+    'RatingReview',
 ]
 
 CORS_ALLOWED_ORIGINS = [
