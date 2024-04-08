@@ -1,91 +1,119 @@
+
 from rest_framework import serializers
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework import status
 from django.http import JsonResponse, HttpResponseBadRequest
 from django.core.files.storage import FileSystemStorage
 from cloudinary.uploader import upload
+from rest_framework.permissions import IsAdminUser
 
 from .models import Product, Category
 from .serializer import ProductSerializer, CategorySerializer
 from rest_framework.pagination import PageNumberPagination
+from RatingReview.serializer import ReviewSerializer
 
 @api_view(['GET'])
 def getRoutes(request):
     return Response('Hello')
 
-@api_view(['GET', 'POST'])
+@api_view(['GET'])
 def getProducts(request):
-    if request.method == 'GET':
-        # products = Product.objects.all()
-        # serializer = ProductSerializer(products, many=True)
-        # return Response(serializer.data)
-        products = Product.objects.all()
-        paginator = PageNumberPagination()
-        paginator.page_size = 8  
-        paginated_products = paginator.paginate_queryset(products, request)       
-        serializer = ProductSerializer(paginated_products, many=True)
-        return paginator.get_paginated_response(serializer.data)
-    elif request.method == 'POST':
-        serializer = ProductSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    # products = Product.objects.all()
+    products = Product.objects.all().order_by('-createdAt')  # Newest products first
+    paginator = PageNumberPagination()
+    paginator.page_size = 4  
+    paginated_products = paginator.paginate_queryset(products, request)       
+    serializer = ProductSerializer(paginated_products, many=True)
+    return paginator.get_paginated_response(serializer.data)
 
-@api_view(['GET', 'PUT', 'DELETE'])
-def getProductDetail(request, pk):
+@api_view(['POST'])
+@permission_classes([IsAdminUser])
+def createProduct(request):
+    serializer = ProductSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def getProduct(request, pk):
     try:
         product = Product.objects.get(pk=pk)
+        serializer = ProductSerializer(product)
+        return Response(serializer.data)
     except Product.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
-    if request.method == 'GET':
-        serializer = ProductSerializer(product)
-        return Response(serializer.data)
-    elif request.method == 'PUT':
+@api_view(['PUT'])
+@permission_classes([IsAdminUser])
+def updateProduct(request, pk):
+    try:
+        product = Product.objects.get(pk=pk)
         serializer = ProductSerializer(product, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    elif request.method == 'DELETE':
+    except Product.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['DELETE'])
+@permission_classes([IsAdminUser])
+def deleteProduct(request, pk):
+    try:
+        product = Product.objects.get(pk=pk)
         product.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-    
+    except Product.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
-@api_view(['GET', 'POST'])
+@api_view(['GET'])
 def getCategories(request):
-    if request.method == 'GET':
-        categories = Category.objects.all()
-        serializer = CategorySerializer(categories, many=True)
-        return Response(serializer.data)
-    elif request.method == 'POST':
-        serializer = CategorySerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    categories = Category.objects.all()
+    serializer = CategorySerializer(categories, many=True)
+    return Response(serializer.data)
 
-@api_view(['GET', 'PUT', 'DELETE'])
-def getCategoryDetail(request, pk):
+@api_view(['POST'])
+@permission_classes([IsAdminUser])
+def createCategory(request):
+    serializer = CategorySerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def getCategory(request, pk):
     try:
         category = Category.objects.get(pk=pk)
+        serializer = CategorySerializer(category)
+        return Response(serializer.data)
     except Category.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
-    if request.method == 'GET':
-        serializer = CategorySerializer(category)
-        return Response(serializer.data)
-    elif request.method == 'PUT':
+@api_view(['PUT'])
+@permission_classes([IsAdminUser])
+def updateCategory(request, pk):
+    try:
+        category = Category.objects.get(pk=pk)
         serializer = CategorySerializer(category, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    elif request.method == 'DELETE':
+    except Category.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['DELETE'])
+@permission_classes([IsAdminUser])
+def deleteCategory(request, pk):
+    try:
+        category = Category.objects.get(pk=pk)
         category.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+    except Category.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
 @api_view(['GET'])
 def getProductsByCategory(request, category_pk):
@@ -106,3 +134,21 @@ def upload_image(request):
         uploaded_file = upload(image_file)
         return JsonResponse({'uploaded_file_url': uploaded_file['secure_url']})
     return HttpResponseBadRequest()
+
+
+# @api_view(['GET'])
+# def getTopProducts(request):
+#     products = Product.objects.filter(rating__gte=4).order_by('-rating')[0:5]
+#     serializer = ProductSerializer(products, many=True)
+#     return Response(serializer.data)
+from django.db import models  
+
+@api_view(['GET'])
+def getTopProducts(request):
+    
+    products = Product.objects.annotate(
+        avg_rating=models.Avg('reviews__rating')
+    ).filter(avg_rating__gt=0).order_by('-avg_rating')[:4]
+
+    serializer = ProductSerializer(products, many=True)
+    return Response(serializer.data)
