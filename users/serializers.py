@@ -27,7 +27,7 @@ class AccountSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Account
-        fields = ['id', 'first_name', 'last_name', 'username', 'email', 'phone_number', 'date_of_birth', 'password', 'confirm_password']
+        fields = ['id', 'first_name', 'last_name', 'username', 'email', 'phone_number', 'date_of_birth', 'password', 'confirm_password', 'image']
         extra_kwargs = {
             'password': {'write_only': True},
         }
@@ -42,19 +42,19 @@ class AccountSerializer(serializers.ModelSerializer):
         validated_data.pop('confirm_password')
         return Account.objects.create_user(**validated_data)
 
-    # def update(self, instance, validated_data):
-    #     password = validated_data.pop('password', None)
-    #     confirm_password = validated_data.pop('confirm_password', None)
+    def update(self, instance, validated_data):
+        password = validated_data.pop('password', None)
+        confirm_password = validated_data.pop('confirm_password', None)
 
-    #     if password and confirm_password:
-    #         if password != confirm_password:
-    #             raise serializers.ValidationError("Passwords do not match")
+        if password and confirm_password:
+            if password != confirm_password:
+                raise serializers.ValidationError("Passwords do not match")
 
-    #     user = super().update(instance, validated_data)
-    #     if password:
-    #         user.set_password(password)
-    #         user.save()
-    #     return user
+        user = super().update(instance, validated_data)
+        if password:
+            user.set_password(password)
+            user.save()
+        return user
 
 class AuthSerializer(serializers.Serializer):
     email = serializers.CharField()

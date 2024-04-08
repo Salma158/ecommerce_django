@@ -15,6 +15,11 @@ class WishlistGetandAdd(generics.ListCreateAPIView):
     serializer_class = WishlistSerializer
     queryset = Wishlist.objects.all()
 
+    def get_queryset(self):
+        user = self.request.user
+        wishlists = Wishlist.objects.filter(user=user)
+        return wishlists
+
     def create(self, request):
         product_id = request.data.get('product')
         user = request.user

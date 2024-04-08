@@ -7,6 +7,8 @@ from django.contrib.auth import authenticate
 from .serializers import AccountSerializer, AuthSerializer
 from rest_framework.generics import RetrieveUpdateDestroyAPIView
 from rest_framework_simplejwt.tokens import RefreshToken
+from cloudinary.uploader import upload
+from rest_framework.decorators import api_view
 
 
 
@@ -14,7 +16,6 @@ class Registeration(APIView):
     permission_classes = [AllowAny]
     
     def post(self, request):
-        
         serializer = AccountSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
@@ -49,3 +50,12 @@ class UserProfileDetailAPIView(RetrieveUpdateDestroyAPIView):
 
     def perform_update(self, serializer):
         serializer.save(user=self.request.user)
+
+
+@api_view(['POST'])
+def upload_image(request):
+    if request.method == 'POST' and request.FILES['image']:
+        image_file = request.FILES['image']
+        uploaded_file = upload(image_file)
+        return JsonResponse({'uploaded_file_url': uploaded_file['secure_url']})
+    return HttpResponseBadRequest()
