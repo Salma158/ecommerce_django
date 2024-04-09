@@ -21,6 +21,7 @@ class WishlistGetandAdd(generics.ListCreateAPIView):
         return wishlists
 
     def create(self, request):
+        
         product_id = request.data.get('product')
         user = request.user
         wishlist, created = Wishlist.objects.get_or_create(user=user)
@@ -29,7 +30,6 @@ class WishlistGetandAdd(generics.ListCreateAPIView):
             product = Product.objects.get(_id=product_id)
         except Product.DoesNotExist:
             return Response({"message": "Product not found."}, status=status.HTTP_404_NOT_FOUND)
-
         if product in wishlist.product.all():
             return Response({"message": "Product already exists in the wishlist."}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -46,6 +46,7 @@ class WishlistDelete(APIView):
     permission_classes = [IsAuthenticated]
 
     def delete(self, request, product_id):
+        
         user = request.user
         wishlist = get_object_or_404(Wishlist, user=user)
         product = get_object_or_404(Product, pk=product_id)

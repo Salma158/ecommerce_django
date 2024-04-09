@@ -3,34 +3,46 @@ from .models import Account
 from django.contrib.auth import authenticate
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
+
 import re
 
 def validate_password_strength(password):
+    errors = []
+
     if len(password) < 8:
-        raise serializers.ValidationError("Password must be at least 8 characters long.")
-    
+        errors.append("Password must be at least 8 characters long.")
+
     if not re.search(r'[A-Z]', password):
-        raise serializers.ValidationError("Password must contain at least one uppercase letter.")
-    
+        errors.append("Password must contain at least one uppercase letter.")
+
     if not re.search(r'[a-z]', password):
-        raise serializers.ValidationError("Password must contain at least one lowercase letter.")
-    
+        errors.append("Password must contain at least one lowercase letter.")
+
     if not re.search(r'[0-9]', password):
-        raise serializers.ValidationError("Password must contain at least one number.")
-    
+        errors.append("Password must contain at least one number.")
+
     if not re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
-        raise serializers.ValidationError("Password must contain at least one special character (!@#$%^&*(),.?\":{}|<>).")
+        errors.append("Password must contain at least one special character.")
+
+    return errors
+
 
 class AccountSerializer(serializers.ModelSerializer):
     confirm_password = serializers.CharField(write_only=True)
-    password = serializers.CharField(write_only=True, validators=[validate_password_strength])
+    password = serializers.CharField(write_only=True)
 
     class Meta:
         model = Account
-        fields = ['id', 'first_name', 'last_name', 'username', 'email', 'phone_number', 'date_of_birth', 'password', 'confirm_password', 'image']
+        fields = ['id', 'first_name', 'last_name', 'username', 'email', 'phone_number', 'password', 'confirm_password', 'image']
         extra_kwargs = {
             'password': {'write_only': True},
         }
+
+    def validate_password(self, value):
+        errors = validate_password_strength(value)
+        if errors:
+            raise serializers.ValidationError(errors)
+        return value
 
     def validate(self, data):
         if data.get('password') != data.get('confirm_password'):
@@ -38,7 +50,6 @@ class AccountSerializer(serializers.ModelSerializer):
         return data
 
     def create(self, validated_data):
-
         validated_data.pop('confirm_password')
         return Account.objects.create_user(**validated_data)
 
@@ -56,8 +67,9 @@ class AccountSerializer(serializers.ModelSerializer):
             user.save()
         return user
 
+
 class AuthSerializer(serializers.Serializer):
-    email = serializers.CharField()
+    email = serializers.EmailField()
     password = serializers.CharField(write_only=True)
 
     def validate(self, attrs):
@@ -65,11 +77,12 @@ class AuthSerializer(serializers.Serializer):
         password = attrs.get('password')
 
         if email and password:
-            user = Account.objects.get(email=email)
-            if user.check_password(password):
+            user = authenticate(email=email, password=password)
+
+            if user is not None:
                 attrs['user'] = user
             else:
-                raise serializers.ValidationError("Unable to login with provided credentials.")
+                raise serializers.ValidationError("Invalid email or password.")
         else:
             raise serializers.ValidationError("Must include 'email' and 'password'.")
 
