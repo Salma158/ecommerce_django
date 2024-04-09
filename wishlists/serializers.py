@@ -1,18 +1,3 @@
-# from rest_framework import serializers
-# from .models import Wishlist
-# from products.serializer import ProductSerializer
-
-# class WishlistSerializer(serializers.ModelSerializer):
-#     product_details = ProductSerializer(many=True, read_only=True)
-
-#     class Meta:
-#         model = Wishlist
-#         fields = ['user', 'products', 'product_details'] 
-
-#     def validate_products(self, value): 
-#         if not Product.objects.filter(pk=value.pk).exists():
-#             raise serializers.ValidationError("Product does not exist.")
-#         return value
 from rest_framework import serializers
 from .models import Wishlist
 from products.serializer import ProductSerializer
