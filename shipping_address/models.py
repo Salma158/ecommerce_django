@@ -1,17 +1,21 @@
 from django.db import models
 from users.models import Account
-from order.models import Order
+from django.core.exceptions import ValidationError
 
-# Create your models here.
 
-class ShippingAddress(models.Model):
-    user = models.ForeignKey(Account, on_delete=models.CASCADE)
-    shipping_address = models.AutoField(primary_key = True, editable = False)
-    address = models.CharField(max_length=300)
-    city = models.CharField(max_length=60)
-    postalCode = models.CharField(max_length=10)
-    country = models.CharField(max_length=60)
-    order = models.OneToOneField(Order, on_delete=models.CASCADE, null=True, blank=True)
+def stringValidation(value):
+    if not value.isalpha():
+        raise ValidationError('Only characters are allowed.')
     
-    def __str__(self):
-        return str(self.address)
+class ShippingAddress(models.Model):
+    shipping_address = models.AutoField(primary_key = True, editable = False)
+    first_name = models.CharField(max_length=50, validators=[stringValidation], default='prefer not to say')
+    last_name = models.CharField(max_length=50, validators=[stringValidation], default='prefer not to say')
+    address = models.CharField(max_length=300)
+    city = models.CharField(max_length=60, validators=[stringValidation])
+    postalCode = models.CharField(max_length=10)
+    
+    
+class userAdresses(models.Model):
+    shipping_address = models.ForeignKey(ShippingAddress, on_delete=models.CASCADE , related_name='user_addresses')
+    user = models.ForeignKey(Account, on_delete=models.CASCADE)
