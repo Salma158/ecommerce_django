@@ -26,7 +26,9 @@ urlpatterns = [
     path('products/<int:pk>/', views.getProduct, name='getProduct'),
     path('products/<int:pk>/update/', views.updateProduct, name='updateProduct'),
     path('products/<int:pk>/delete/', views.deleteProduct, name='deleteProduct'),
-    path('products/search/<str:query>/', views.productSearch, name='productSearch'),
+    # path('products/search/<str:query>/', views.productSearch, name='productSearch'),
+    path('products/search/<str:query>/', views.product_search, name='product_search'),
+
     
     # Category routes
     path('categories/', views.getCategories, name='getCategories'),
