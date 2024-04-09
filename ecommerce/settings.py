@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'order',
     'shipping_address',
     'RatingReview',
+    'cart',
 ]
 
 CORS_ALLOWED_ORIGINS = [
