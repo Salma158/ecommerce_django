@@ -41,6 +41,10 @@ def getProduct(request, pk):
     try:
         product = Product.objects.get(pk=pk)
         serializer = ProductSerializer(product)
+        num_reviews = product.reviews.count()
+        
+        response_data = serializer.data
+        response_data['num_reviews'] = num_reviews
         return Response(serializer.data)
     except Product.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
