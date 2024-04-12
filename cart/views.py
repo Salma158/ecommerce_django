@@ -18,15 +18,16 @@ class CartList(ListCreateAPIView):
     
     def post(self, request):
         user = request.user
-        _id = request.data.get('product')
-        #quantity = request.data.get('quantity')
-        cart, created = Cart.objects.get_or_create(user=user)
-        product = Product.objects.get(pk= _id)
+        product_id = request.data.get('product')
+        cart, _ = Cart.objects.get_or_create(user=user)
+        product = get_object_or_404(Product, pk=product_id)
         cart_item, created = CartItems.objects.get_or_create(cart=cart, product=product)
+        if product.stock <= cart_item.quantity:
+            raise serializers.ValidationError({'error': 'No more available quantity'})        
         if not created:
             cart_item.quantity += 1
             cart_item.save()
-    
+        cart_item.refresh_from_db()
         serializer = self.get_serializer(cart_item)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
@@ -37,7 +38,7 @@ class CartItemDelete(DestroyAPIView):
         user = request.user
         cart_item = get_object_or_404(CartItems, cart__user=user, product=pk)
         cart_item.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response({'message': 'Cart item is deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
 
 class CartItemUpdate(UpdateAPIView):
     serializer_class = CartItemsSerializer
@@ -48,7 +49,7 @@ class CartItemUpdate(UpdateAPIView):
         action = request.data.get('action')
         cart_item = get_object_or_404(CartItems, cart__user=user, product=pk)
         if action not in ('Increase', 'Decrease'):
-            raise serializers.ValidationError({'error': "Action can only be 'INCREASE' or 'DECREASE'"})
+            raise serializers.ValidationError({ 'error': "Action can only be 'Increase' or 'Decrease'"})
         if action == "Increase":
             product = cart_item.product
             if product.stock > cart_item.quantity:
@@ -60,6 +61,8 @@ class CartItemUpdate(UpdateAPIView):
                 cart_item.quantity-=1
             else:
                 cart_item.delete()
+                return Response({'message': 'Cart item is deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
+        cart_item.refresh_from_db()
         cart_item.save()
         serializer = self.get_serializer(cart_item)
         return Response(serializer.data)
