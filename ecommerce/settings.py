@@ -190,3 +190,6 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.AllowAny',
     ],
 }
+
+SITE_URL = 'http://localhost:3000'
+STRIPE_SECRET_KEY ='sk_test_51P4d9p03YeN96iJ6liHDdQVUzGYKRsuwrtEZ3Cxr4YjmHSLkHNqMEOXoYk9z7I9Gc1a0wteRcWxFgFvUYE9QIe1C00iLKh7ZJl'

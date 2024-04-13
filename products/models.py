@@ -2,7 +2,6 @@
 from django.db import models
 from cloudinary.models import CloudinaryField
 from django.db.models import Avg
-# from RatingReview.models import Review
 
 class Category(models.Model):
     categoryname = models.CharField(max_length=30)
@@ -25,8 +24,7 @@ class Product(models.Model):
     stock = models.IntegerField(null=True, blank=True, default=0)
     createdAt = models.DateTimeField(auto_now_add=True)
     _id = models.AutoField(primary_key=True, editable=False)
-    numReviews = models.IntegerField(null=True, blank=True, default=0)
-    # reviews = models.ManyToManyField(Review, related_name='products')
+    
    
 
 
