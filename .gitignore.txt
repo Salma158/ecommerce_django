@@ -1,1 +1,9 @@
-*/__pycache__/
+cart/__pycache__/
+ecommerce/__pycache__/
+order/__pycache__/
+products/__pycache__/
+RatingReview/__pycache__/
+shipping_address/__pycache__/
+users/__pycache__/
+wishlists/__pycache__/
+.env

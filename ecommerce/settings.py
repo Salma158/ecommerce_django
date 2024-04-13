@@ -10,13 +10,28 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': os.getenv('MYSQLDATABASE'),
+#         'USER': os.getenv('MYSQLUSER'),
+#         'PASSWORD': os.getenv('MYSQLPASSWORD'),
+#         'HOST': os.getenv('MYSQLHOST'),
+#         'PORT': os.getenv('MYSQLPORT'),
+#     }
+# }
+
 import os
 from pathlib import Path
 import cloudinary
 import cloudinary.uploader
 import cloudinary.api
-
 from datetime import timedelta
+from dotenv import load_dotenv
+import os
+load_dotenv()
+
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -27,7 +42,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-rjr6k!*!e%mnqd5e!0i2eav#y^&&dxwwjo@!uhx#l(&7u&j!z&'
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -101,19 +116,19 @@ WSGI_APPLICATION = 'ecommerce.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.environ.get('MYSQLDATABASE', 'railway'),
-        'USER': os.environ.get('MYSQLUSER', 'root'),
-        'PASSWORD': os.environ.get('MYSQLPASSWORD', 'lVwOlghIVtifZwlkVCjMvfvLbOIUINnW'),
-        'HOST': os.environ.get('MYSQLHOST', 'roundhouse.proxy.rlwy.net'),
-        'PORT': os.environ.get('MYSQLPORT', '52117'),
+        'NAME': os.getenv('MYSQLDATABASE'),
+        'USER': os.getenv('MYSQLUSER'),
+        'PASSWORD': os.getenv('MYSQLPASSWORD'),
+        'HOST': os.getenv('MYSQLHOST'),
+        'PORT': os.getenv('MYSQLPORT'),
     }
 }
 
-MYSQL_DATABASE = os.environ.get('MYSQL_DATABASE', 'railway')
-MYSQL_PRIVATE_URL = os.environ.get('MYSQL_PRIVATE_URL', 'mysql://root:lVwOlghIVtifZwlkVCjMvfvLbOIUINnW@mysql.railway.internal:3306/railway')
-MYSQL_ROOT_PASSWORD = os.environ.get('MYSQL_ROOT_PASSWORD', 'lVwOlghIVtifZwlkVCjMvfvLbOIUINnW')
-MYSQL_URL = os.environ.get('MYSQL_URL', 'mysql://root:lVwOlghIVtifZwlkVCjMvfvLbOIUINnW@roundhouse.proxy.rlwy.net:52117/railway')
-
+# Additional MySQL related settings
+MYSQL_DATABASE = os.getenv('MYSQL_DATABASE')
+MYSQL_PRIVATE_URL = os.getenv('MYSQL_PRIVATE_URL')
+MYSQL_ROOT_PASSWORD = os.getenv('MYSQL_ROOT_PASSWORD')
+MYSQL_URL = os.getenv('MYSQL_URL')
 
 
 
@@ -121,9 +136,9 @@ MYSQL_URL = os.environ.get('MYSQL_URL', 'mysql://root:lVwOlghIVtifZwlkVCjMvfvLbO
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': 'dzwxhvj5m',
-    'API_KEY': '485762354413643',
-    'API_SECRET': 'Q67RPKvbGneFLeWj1oNxuHXIvB4'
+    'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME'),
+    'API_KEY': os.getenv('CLOUDINARY_API_KEY'),
+    'API_SECRET': os.getenv('CLOUDINARY_API_SECRET')
 }
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -192,4 +207,4 @@ REST_FRAMEWORK = {
 }
 
 SITE_URL = 'http://localhost:3000'
-STRIPE_SECRET_KEY ='sk_test_51P4d9p03YeN96iJ6liHDdQVUzGYKRsuwrtEZ3Cxr4YjmHSLkHNqMEOXoYk9z7I9Gc1a0wteRcWxFgFvUYE9QIe1C00iLKh7ZJl'
+STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY')
