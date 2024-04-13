@@ -30,8 +30,9 @@ class WishlistGetandAdd(generics.ListCreateAPIView):
             product = Product.objects.get(_id=product_id)
         except Product.DoesNotExist:
             return Response({"message": "Product not found."}, status=status.HTTP_404_NOT_FOUND)
-        if product in wishlist.product.all():
-            return Response({"message": "Product already exists in the wishlist."}, status=status.HTTP_400_BAD_REQUEST)
+        # if product in wishlist.product.all():
+        #     print("hereee")
+        #     return Response({"message": "Product already exists in the wishlist."}, status=status.HTTP_400_BAD_REQUEST)
 
         wishlist.product.add(product)
         

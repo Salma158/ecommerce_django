@@ -23,9 +23,9 @@ class ProductImageSerializer(serializers.ModelSerializer):
 
 class ProductSerializer(serializers.ModelSerializer):
     productcategory = CategorySerializer()
-    num_reviews = serializers.SerializerMethodField()
-    reviews = ReviewSerializer(many=True, read_only=True)  
-    average_rating = serializers.SerializerMethodField()
+    # num_reviews = serializers.SerializerMethodField()
+    # reviews = ReviewSerializer(many=True, read_only=True)  
+    # average_rating = serializers.SerializerMethodField()
     images = ProductImageSerializer(many=True, read_only=True)  
 
     class Meta:
@@ -33,20 +33,20 @@ class ProductSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-    def get_num_reviews(self, obj):
-        """
-        Returns the number of reviews associated with this product.
-        """
-        return obj.reviews.count()
+    # def get_num_reviews(self, obj):
+    #     """
+    #     Returns the number of reviews associated with this product.
+    #     """
+    #     return obj.reviews.count()
 
-    def get_average_rating(self, obj):
-        """
-        Returns the average rating of the product based on its reviews.
-        """
-        reviews = obj.reviews.all()
-        if reviews.exists():
-            total_rating = sum(review.rating for review in reviews)
-            return total_rating / reviews.count()
-        else:
-            return 0
+    # def get_average_rating(self, obj):
+    #     """
+    #     Returns the average rating of the product based on its reviews.
+    #     """
+    #     reviews = obj.reviews.all()
+    #     if reviews.exists():
+    #         total_rating = sum(review.rating for review in reviews)
+    #         return total_rating / reviews.count()
+    #     else:
+    #         return 0
 

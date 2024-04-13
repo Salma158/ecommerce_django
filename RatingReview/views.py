@@ -60,23 +60,34 @@ def create_product_review(request, pk):
 
     data = request.data
 
-
     if data.get('rating', 0) == 0:
         content = {'detail': 'Please select a rating'}
         return Response(content, status=status.HTTP_400_BAD_REQUEST)
-
     else:
         review = Review.objects.create(
-            user = request.user,
+            user=request.user,
             product=product,
-            name=data.get('name', ''),  
+            name=data.get('name', ''),
             rating=data['rating'],
             comment=data.get('comment', ''),
         )
+        # product.numReviews = product.reviews.count()
 
-        product.numReviews = product.reviews.count()
-        product.rating = product.reviews.aggregate(Avg('rating'))['rating__avg']
+        total_rating = Review.objects.filter(product=product).aggregate(Avg('rating'))['rating__avg']
+        product.rating = total_rating
+
         product.save()
 
         serializer = ReviewSerializer(review)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+@api_view(['GET'])
+def get_product_reviews(request, pk):
+    try:
+        product = Product.objects.get(pk=pk)
+        reviews = product.reviews.all()
+        serializer = ReviewSerializer(reviews, many=True)
+        return Response(serializer.data)
+    except Product.DoesNotExist:
+        return Response({'detail': 'Product not found'}, status=status.HTTP_404_NOT_FOUND)

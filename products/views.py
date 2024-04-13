@@ -30,6 +30,7 @@ def getProducts(request):
 @api_view(['POST'])
 @permission_classes([IsAdminUser])
 def createProduct(request):
+    print("hiii")
     serializer = ProductSerializer(data=request.data)
     if serializer.is_valid():
         serializer.save()

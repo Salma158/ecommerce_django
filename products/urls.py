@@ -22,7 +22,8 @@ urlpatterns = [
     path('', views.getRoutes, name="Routes"),
     
     # Product routes
-    path('products/', views.getProducts, name='getProducts'),
+    # path('products/', views.getProducts, name='getProducts'),
+    path('products/', views.createProduct, name='getProducts'),
     path('products/<int:pk>/', views.getProduct, name='getProduct'),
     path('products/<int:pk>/update/', views.updateProduct, name='updateProduct'),
     path('products/<int:pk>/delete/', views.deleteProduct, name='deleteProduct'),

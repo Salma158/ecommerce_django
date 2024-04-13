@@ -44,10 +44,16 @@ class AccountSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(errors)
         return value
 
+    def validate_phone_number(self, value):
+        if not re.match(r'^01[0-2]\d{8}$', value):
+            raise serializers.ValidationError("Phone number must be a valid Egyptian number.")
+        return value
+
     def validate(self, data):
         if data.get('password') != data.get('confirm_password'):
             raise serializers.ValidationError("Password and confirm password do not match.")
         return data
+
 
     def create(self, validated_data):
         validated_data.pop('confirm_password')
