@@ -31,8 +31,7 @@ def create_product_review(request, pk):
             comment=data.get('comment', ''),
         )
 
-        # product.numReviews = product.reviews.count()
-        # product.rating = product.reviews.aggregate(Avg('rating'))['rating__avg']
+        
         total_rating = Review.objects.filter(product=product).aggregate(Avg('rating'))['rating__avg']       
         product.rating = total_rating
         

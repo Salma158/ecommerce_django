@@ -7,7 +7,7 @@ from django.http import JsonResponse, HttpResponseBadRequest
 from django.core.files.storage import FileSystemStorage
 from cloudinary.uploader import upload
 from rest_framework.permissions import IsAdminUser
-
+from django.db import models  
 from .models import Product, Category
 from .serializer import ProductSerializer, CategorySerializer
 from rest_framework.pagination import PageNumberPagination
@@ -20,7 +20,7 @@ def getRoutes(request):
 @api_view(['GET'])
 def getProducts(request):
     # products = Product.objects.all()
-    products = Product.objects.all().order_by('-createdAt')  # Newest products first
+    products = Product.objects.all().order_by('-createdAt')  
     paginator = PageNumberPagination()
     paginator.page_size = 4  
     paginated_products = paginator.paginate_queryset(products, request)       
@@ -125,11 +125,6 @@ def getProductsByCategory(request, category_pk):
     serializer = ProductSerializer(products, many=True)
     return Response(serializer.data)
 
-# @api_view(['GET'])
-# def productSearch(request, query):
-#     products = Product.objects.filter(productname__icontains=query)
-#     serializer = ProductSerializer(products, many=True)
-#     return Response(serializer.data)
 
 @api_view(['GET'])
 def product_search(request, query):
@@ -146,12 +141,6 @@ def upload_image(request):
     return HttpResponseBadRequest()
 
 
-# @api_view(['GET'])
-# def getTopProducts(request):
-#     products = Product.objects.filter(rating__gte=4).order_by('-rating')[0:5]
-#     serializer = ProductSerializer(products, many=True)
-#     return Response(serializer.data)
-from django.db import models  
 
 @api_view(['GET'])
 def getTopProducts(request):
