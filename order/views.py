@@ -35,6 +35,9 @@ def checkoutView(request):
 
     total_price = sum(item.product.price * item.quantity for item in cart_items)
     order = Order.objects.create(user=user, total_price=total_price)
+
+    order.delivery_date = request.data.get("delivery_date", order.delivery_date)
+    order.save()
     for item in cart_items:
         OrderItems.objects.create(
             product=item.product,
@@ -125,7 +128,6 @@ def updateOrderById(order, data):
     if order.order_status != 'Cancelled' and order.shipping_status != 'Delivered':
         order.order_status = data.get("order_status", order.order_status)
         order.shipping_status = data.get("shipping_status", "Cancelled")
-        order.delivery_date = data.get("delivery_date", order.delivery_date)
         order.save()
     if order.order_status == 'Cancelled' or order.shipping_status == 'Cancelled':
         order.shipping_status = data.get("shipping_status", "Cancelled")
