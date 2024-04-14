@@ -86,7 +86,7 @@ class PasswordResetAPIView(APIView):
             if user:
                 token = default_token_generator.make_token(user)
                 uid = urlsafe_base64_encode(force_bytes(user.pk))
-                frontend_reset_url = settings.FRONTEND_URL + 'reset-password?token=' + token + '&uid=' + uid
+                frontend_reset_url = settings.FRONTEND_URL + '/reset-password?token=' + token + '&uid=' + uid
                 send_mail(
                     'Reset your password',
                     f'Hi {user.username},\n\n'
@@ -112,7 +112,6 @@ class ResetPasswordAPIView(APIView):
             uid = serializer.validated_data.get('uid')
 
             try:
-                # user_id = force_text(urlsafe_base64_decode(uid))
                 user_id = urlsafe_base64_decode(uid)
                 user_id = smart_bytes(user_id).decode('utf-8')
                 user = Account.objects.get(pk=user_id)

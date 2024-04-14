@@ -75,6 +75,7 @@ INSTALLED_APPS = [
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
+    'https://ecommercereact-e3f21.web.app'
 ]
 FRONTEND_URL = 'http://localhost:3000'
 
