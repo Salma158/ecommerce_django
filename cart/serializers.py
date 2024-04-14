@@ -7,10 +7,11 @@ class CartItemsSerializer(serializers.ModelSerializer):
     stock = serializers.CharField(source='product.stock')
     image = serializers.ImageField(source='product.image')
     _id = serializers.IntegerField(source='product._id')
+    price = serializers.DecimalField(source='product.price', max_digits=10, decimal_places=2)
 
     class Meta:
         model = CartItems
-        fields = ['productname', 'stock', 'image', 'quantity', '_id']
+        fields = ['productname', 'stock', 'image', 'quantity', '_id', 'price']
 
 class CartSerializer(serializers.ModelSerializer):
     cart_items = CartItemsSerializer()

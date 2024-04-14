@@ -5,11 +5,8 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework import status
 from .models import Order,OrderItems
-from .serializers import  OrderSerializer
-from datetime import datetime, timedelta
-from django.utils import timezone
+from .serializers import  OrderSerializer, OrderItemsSerializer
 from cart.models import CartItems
-from django.shortcuts import redirect
 import stripe
 from django.conf import settings
 from django.db import transaction
@@ -32,6 +29,7 @@ def checkoutView(request):
                 'currency': 'usd',
                 'product_data': {
                     'name': cart_item.product.productname,
+                    'images': [cart_item.product.image],
                 },
                 'unit_amount': int(cart_item.product.price * 100),  # Price in cents
             },
@@ -88,9 +86,12 @@ def checkoutView(request):
 def getAllOrders(request):
     user = request.user
     if request.method == 'GET':
-        orders = Order.objects.all()
+        
+        orders = Order.objects.filter(user=user)
         serializer = OrderSerializer(orders, many = True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
     
     # elif request.method =='POST':
     #     serializer = OrderSerializer(data = request.data)
@@ -104,20 +105,26 @@ def getAllOrders(request):
 
         
 
-@api_view(['GET','PATCH','DELETE'])
+@api_view(['GET', 'PATCH', 'DELETE'])
 @permission_classes([IsAuthenticated])
 def getOrderById(request, pk):
     try:
-        order = Order.objects.get(order_id=pk)
+        order = Order.objects.prefetch_related('orderitems_set').get(order_id=pk)
+        serializer = OrderSerializer(order)
     except Order.DoesNotExist:
-        return Response({"detail": "Order not found."}, status=status.HTTP_404_NOT_FOUND)\
+        return Response({"detail": "Order not found."}, status=status.HTTP_404_NOT_FOUND)
         
     if order.user != request.user:
         return Response({"detail": "You do not have permission to access this order."}, status=status.HTTP_403_FORBIDDEN)
 
     if request.method == 'GET':
-        serializer = OrderSerializer(order)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        order_serializer = OrderSerializer(order)
+        order_items_serializer = OrderItemsSerializer(order.orderitems_set.all(), many=True)
+        data = {
+            "order": order_serializer.data,
+            "order_items": order_items_serializer.data
+        }
+        return Response(data, status=status.HTTP_200_OK)
     
     elif request.method == 'DELETE':
         order.delete()
@@ -127,6 +134,7 @@ def getOrderById(request, pk):
         updateOrderById(order, request.data)
         serializer = OrderSerializer(order)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 def updateOrderById(order, data):
     if order.order_status != 'Cancelled' and order.shipping_status != 'Delivered':
