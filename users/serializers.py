@@ -93,3 +93,13 @@ class AuthSerializer(serializers.Serializer):
             raise serializers.ValidationError("Must include 'email' and 'password'.")
 
         return attrs
+        
+class ForgotPasswordSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+
+
+class ResetPasswordSerializer(serializers.Serializer):
+    token = serializers.CharField()
+    uid = serializers.CharField()
+    new_password = serializers.CharField()
