@@ -77,7 +77,7 @@ CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
     'https://ecommercereact-e3f21.web.app'
 ]
-FRONTEND_URL = 'http://localhost:3000'
+FRONTEND_URL = 'https://ecommercereact-e3f21.web.app'
 
 
 AUTH_USER_MODEL = 'users.Account'
@@ -215,5 +215,5 @@ REST_FRAMEWORK = {
     ],
 }
 
-SITE_URL = 'http://localhost:3000'
+SITE_URL = 'https://ecommercereact-e3f21.web.app'
 STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY')
