@@ -21,62 +21,44 @@ def checkoutView(request):
     cart_items = CartItems.objects.filter(cart__user=user)
     if not cart_items:
         return Response({"error": "The Cart Is Empty"}, status=status.HTTP_400_BAD_REQUEST)
-    line_items = []
 
-    for cart_item in cart_items:
-        line_items.append({
-            'price_data': {
-                'currency': 'usd',
-                'product_data': {
-                    'name': cart_item.product.productname,
-                    'images': [cart_item.product.image],
-                },
-                'unit_amount': int(cart_item.product.price * 100),  # Price in cents
+    line_items = [{
+        'price_data': {
+            'currency': 'usd',
+            'product_data': {
+                'name': item.product.productname,
             },
-            'quantity': cart_item.quantity,
-        })
+            'unit_amount': int(item.product.price * 100),
+        },
+        'quantity': item.quantity,
+    } for item in cart_items]
+
+    total_price = sum(item.product.price * item.quantity for item in cart_items)
+    order = Order.objects.create(user=user, total_price=total_price)
+    for item in cart_items:
+        OrderItems.objects.create(
+            product=item.product,
+            quantity=item.quantity,
+            price=item.product.price,
+            order_id=order
+        )
+        item.product.stock -= item.quantity
+        item.product.save()
+
+    cart_items.delete()
 
     try:
-        with transaction.atomic():
-            checkout_session = stripe.checkout.Session.create(
-                payment_method_types=['card'],
-                line_items=line_items,
-                mode='payment',
-                success_url=settings.SITE_URL + '?success=true&session_id={CHECKOUT_SESSION_ID}',
-                cancel_url=settings.SITE_URL + '?canceled=true',
-            )
-            order = None
-            
-            # Your code to place the order after confirming the payment
-            if checkout_session.payment_status == 'paid':
-                total_price = sum(cart_item.product.price * cart_item.quantity for cart_item in cart_items)
-                order_instance = Order.objects.create(
-                    user=user,
-                    total_price=total_price,
-                )
-
-                for cart_item in cart_items:
-                    OrderItems.objects.create(
-                        product=cart_item.product,
-                        quantity=cart_item.quantity,
-                        price=cart_item.product.price,
-                        order_id=order_instance.id  # Ensure to use order_instance.id instead of order_instance
-                    )
-
-                # Delete cart items after order creation
-                cart_items.delete()
-
-                # Placeholder for the order
-                order = order_instance
-
-            return Response({'url': checkout_session.url, 'order_id': order.id if order else None}, status=status.HTTP_201_CREATED)
-    except stripe.error.StripeError as e:
-        return Response(
-            {'error': str(e)},
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        checkout_session = stripe.checkout.Session.create(
+            payment_method_types=['card'],
+            line_items=line_items,
+            mode='payment',
+            success_url=settings.SITE_URL + f'?success=true&session_id={{CHECKOUT_SESSION_ID}}',
+            cancel_url=settings.SITE_URL + '?canceled=true',
         )
-
-
+        print("Checkout Session ID:", checkout_session.id)
+        return Response({'checkout_url': checkout_session.url})
+    except stripe.error.StripeError as e:
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 
@@ -131,19 +113,25 @@ def getOrderById(request, pk):
         return Response({"detail": f"Order with ID {pk} is deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
     
     elif request.method == 'PATCH':
-        updateOrderById(order, request.data)
-        serializer = OrderSerializer(order)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        if order.order_status != 'Cancelled' and order.shipping_status != 'Delivered':
+            updateOrderById(order, request.data)
+            serializer = OrderSerializer(order)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response({"detail": "Cannot update order. It is already cancelled or delivered."}, status=status.HTTP_400_BAD_REQUEST)
 
 
 def updateOrderById(order, data):
     if order.order_status != 'Cancelled' and order.shipping_status != 'Delivered':
         order.order_status = data.get("order_status", order.order_status)
-        order.shipping_status = data.get("shipping_status", order.shipping_status)
+        order.shipping_status = data.get("shipping_status", "Cancelled")
         order.delivery_date = data.get("delivery_date", order.delivery_date)
         order.save()
     if order.order_status == 'Cancelled' or order.shipping_status == 'Cancelled':
         order.shipping_status = data.get("shipping_status", "Cancelled")
         order.order_status = data.get("order_status", "Cancelled")
+        for order_item in order.orderitems_set.all():
+                        order_item.product.stock += order_item.quantity
+                        order_item.product.save()
         order.save()
     
