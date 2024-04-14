@@ -6,4 +6,4 @@ RatingReview/__pycache__/
 shipping_address/__pycache__/
 users/__pycache__/
 wishlists/__pycache__/
-.env
+ecommerce/.env

@@ -10,18 +10,6 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': os.getenv('MYSQLDATABASE'),
-#         'USER': os.getenv('MYSQLUSER'),
-#         'PASSWORD': os.getenv('MYSQLPASSWORD'),
-#         'HOST': os.getenv('MYSQLHOST'),
-#         'PORT': os.getenv('MYSQLPORT'),
-#     }
-# }
-
 import os
 from pathlib import Path
 import cloudinary
@@ -77,17 +65,17 @@ CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
     'https://ecommercereact-e3f21.web.app'
 ]
-FRONTEND_URL = 'http://localhost:3000'
+FRONTEND_URL = 'https://ecommercereact-e3f21.web.app'
 
 
 AUTH_USER_MODEL = 'users.Account'
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'bloomosbloomos40@gmail.com'
-EMAIL_HOST_PASSWORD = 'upsv uicl bhpi txjx'
+EMAIL_BACKEND = os.getenv('EMAILBACKEND'),
+EMAIL_HOST = os.getenv('EMAILHOST'),
+EMAIL_PORT = os.getenv('EMAILPORT'),
+EMAIL_USE_TLS = os.getenv('EMAILUSE')
+EMAIL_HOST_USER = os.getenv('EMAILUSER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAILPASS')
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -124,7 +112,7 @@ WSGI_APPLICATION = 'ecommerce.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
+        'ENGINE': os.getenv("ENGINE"),
         'NAME': os.getenv('MYSQLDATABASE'),
         'USER': os.getenv('MYSQLUSER'),
         'PASSWORD': os.getenv('MYSQLPASSWORD'),
@@ -215,5 +203,5 @@ REST_FRAMEWORK = {
     ],
 }
 
-SITE_URL = 'http://localhost:3000'
+SITE_URL = 'https://ecommercereact-e3f21.web.app'
 STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY')
