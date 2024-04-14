@@ -26,4 +26,7 @@ urlpatterns = [
     path('upload-image/', views.upload_image, name='upload_image'),
     path('products/top/', views.getTopProducts, name='top-products'),
 
+    path('products/sorted-by-price/', views.getProductsByPrice, name='getProductsSortedByPrice'),
+
+
 ]
