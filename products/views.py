@@ -152,3 +152,14 @@ def getTopProducts(request):
 
     serializer = ProductSerializer(products, many=True)
     return Response(serializer.data)
+
+
+
+@api_view(['GET'])
+def getProductsByPrice(request):
+    products = Product.objects.all().order_by('-price')  
+    paginator = PageNumberPagination()
+    paginator.page_size = 4
+    paginated_products = paginator.paginate_queryset(products, request)
+    serializer = ProductSerializer(paginated_products, many=True)
+    return paginator.get_paginated_response(serializer.data)
